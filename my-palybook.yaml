@@ -1,0 +1,14 @@
+---
+- name: Configure nginx webserver
+  hosts: lockal,aws
+  become: yes
+  tasks: 
+  - name: install nginx server
+    apt:
+            name: nginx
+            state: latest                  
+  - name: start nginx server
+    service: 
+            name: nginx
+            state: started
+            
