@@ -3,7 +3,7 @@
 [lockal:vars]
 ansible_ssh_private_key_file=~/.ssh/id_rsa
 ansible_user=denis
-ansible_sudo_pass=300994
+ansible_sudo_pass=
 [aws]
 3.124.214.99
 [aws:vars]
