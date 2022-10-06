@@ -1,0 +1,98 @@
+---
+- name: install java and net tools
+  hosts: lockal
+  become: yes
+  tasks:
+   - name: update apt and repo and cache
+     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+   - name: Install java 
+     apt: name=openjdk-8-jre
+   - name: Install net-tools
+     apt: name=net-tools
+
+- name: Download and unpack Nexus installer
+  hosts: lockal
+  become: yes
+  tasks: 
+   - name: download nexus
+     get_url:
+          url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+          dest: /home/denis/
+     register: download_result
+   - name: Unarchive nexus installer
+     unarchive: 
+          src: "{{download_result.dest}}"
+          dest: /home/denis/nexus/
+          remote_src: yes
+
+   - name: find nexus folder
+     find:
+       paths: /home/denis/nexus/
+       patterns: "nexus-*"
+       file_type: directory
+     register: find_result
+   - debug: msg={{find_result}}
+   - name: Check nexus folder stats
+     stat:
+       path: /home/denis/nexus/nexus
+     register: stat_result
+   - debug: msg={{stat_result}}
+   - name: rename nexus folder
+     shell: mv {{find_result.files[0].path}} /home/denis/nexus/nexus
+     when: stat_result.stat.exist 
+
+
+    
+
+- name: Create nexus user to own nexus folder
+  hosts: lockal
+  become: yes
+  tasks:
+    - name: Create nexus user
+      ansible.builtin.user:
+       name: nexus
+       groups: nexus
+       shell: /sbin/nologin
+       create_home: no
+       append: yes
+       password: '*'
+       comment: "nexus nologin User"
+       state: present
+
+    - name: Enshure group nexus exists
+      become: yes 
+      group: 
+        name: nexus
+        state: present
+
+
+    - name: Chown nexus folder
+      become: yes
+      file: 
+       path: /home/denis/nexus/
+       state: directory
+       owner: nexus
+       group: nexus
+       recurse: yes
+
+    - name: Chown sonatype folder
+      become: yes
+      file:
+       path: /home/denis/nexus/sonatype-work
+       state: directory
+       owner: nexus
+       group: nexus
+       recurse: yes
+
+- name: start nexus with nexus user
+  hosts: lockal
+  tasks:
+    - name: set run as user_nexus
+     
+      blockinfile:
+         path: /home/denis/nexus/nexus/bin/nexus.rc
+         block: |
+           run_as_user="nexus"     
+  
+    - name: start nexus
+      command: /home/denis/nexus/nexus/bin/nexus start
