@@ -1,0 +1,72 @@
+---
+- name: install docker
+  hosts: lockal
+  become: yes
+  tasks:
+    - name: install docker
+      apt:
+        name: docker.io
+        update_cache: yes
+        state: present
+       
+    - name: install docker-compose
+      apt:
+        name: docker-compose
+        update_cache: yes
+        state: present
+
+    - name: Ensure group "docker" exists 
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+- name: start docker
+  hosts: lockal
+  become: yes
+  tasks:
+    - name: start docker deamon
+      systemd:
+       name: docker
+       state: started 
+       
+- name: add denis to docker group
+  hosts: lockal
+  become: yes
+  tasks:
+     - name: add denis to docker group
+       user:
+         name: denis
+         groups: docker
+         append: yes
+     - name: reconnect to server session
+       meta: reset_connection
+       #666125743361.dkr.ecr.eu-central-1.amazonaws.com/testesc:
+
+- name: start docker containers
+  hosts: lockal
+  vars_files:
+          - project-vars  
+  become: yes
+  tasks:
+    - name: copy docker-compose
+      copy:
+        src: /home/denis/project-docker/mongo-docker-compose.yaml
+        dest: /home/denis/project-docker/docker-compose.yaml
+   
+- name: docker login
+  hosts: lockal
+  tasks:
+     - name: docker login
+       shell: "{{ item }}"
+       with_items:
+        - $(aws ecr get-login --no-include-email --region eu-central-1)
+    
+     - name: start compose
+       docker_compose:
+               project_src: /home/denis/project-docker/
+                    
+
+      
+       
+       
+ 
