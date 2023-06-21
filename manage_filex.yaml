@@ -1,0 +1,26 @@
+---
+- name: manage files
+  hosts: lockal
+  tasks:
+   - name: change copy file
+     copy:
+      src: /home/denis/ansible/example2.txt
+      dest: /home/denis/example/
+   - name: add lines
+     blockinfile:
+      path: /home/denis/example/example2.txt
+      block: |
+        194.169.01.20
+        asdj
+      state: present
+   - name: veryfi file checksum
+     stat:
+      path: /home/denis/example/example2.txt 
+      checksum_algorithm: md5
+     register: result
+   - debug:
+        msg: "The checksum of /home/denis/example/example2 is {{ result.stat.checksum }} "
+   - name: fetch a file
+     fetch:
+         src: /home/denis/example/example2.txt
+         dest: /home/denis/

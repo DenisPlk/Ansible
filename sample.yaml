@@ -1,0 +1,9 @@
+- name: testplay
+  hosts: lockal
+  tasks:
+   - name: task1
+     debug:
+      msg: hello world
+   - name: task 2
+     debug:
+      msg: hello world2       

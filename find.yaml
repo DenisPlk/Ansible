@@ -1,0 +1,22 @@
+---
+- name: find config
+  hosts: localhost
+  become: true
+  tasks: 
+   - name: find ansible.cfg
+     find:
+      paths: /home/denis/ansible
+      patterns: 'ansible.cfg'
+      recurse: yes
+     register: output
+   - debug:
+      var: item.path
+     with_items: "{{ output.files }}"
+   - blockinfile:
+      path: "{{ item.path }}" 
+      insertafter: "defaults"
+      marker: "##<!-- {mark} ANSIBLE MANAGED BLOCK -->##"
+      block: |
+         fact_caching = redis
+         fact_caching_timeout = 3600
+     with_items: "{{ output.files }}"    

@@ -1,0 +1,41 @@
+---
+- name: lab7
+  hosts: lockal
+  tasks:
+   - name: install vsftpd
+     apt:
+       name: vsftpd
+       state: latest
+   - name: fetch a conf 
+     fetch:
+       src: /etc/vsftpd.conf 
+       dest: /tmp/vsftpd.j2
+       flat: yes
+
+- name: modify file on control
+  hosts: localhost
+  become: yes
+  tasks:        
+   - name:  add line in file
+     lineinfile:
+       path: /tmp/vsftpd.j2
+       line: '#written on {{ ansible_hostname }}'
+
+- name: finish it
+  hosts: lockal
+  tasks: 
+   - name: use template
+     template:
+      src: /tmp/vsftpd.j2
+      dest: /etc/vsftpd.conf
+   - name: start it
+     service:
+      name: vsftpd
+      state: started
+      enabled: yes
+   - name: open firewall
+     firewalld:
+      service: ftp
+      permanent: yes
+      immediate: yes
+      state: enabled

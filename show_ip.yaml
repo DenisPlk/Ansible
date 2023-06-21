@@ -1,0 +1,8 @@
+---
+- name: show ip adress
+  hosts: lockal
+  tasks: 
+   - name: show ip address 
+     debug:
+       msg: >
+           this is ip add {{ ansible_facts['distribution'] }}    

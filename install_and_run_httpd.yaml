@@ -1,0 +1,13 @@
+---
+- name: install and run httpd
+  hosts: lockal
+  tasks:
+   - name: install httpd
+     package:
+      name: apache2      
+      state: latest
+   - name: start and enable service
+     service:
+      name: apache2
+      state: started
+      enabled: yes

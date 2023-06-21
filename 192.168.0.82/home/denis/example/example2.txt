@@ -1,0 +1,10 @@
+hello
+kia
+rio
+nsk
+bad
+ls
+# BEGIN ANSIBLE MANAGED BLOCK
+194.169.01.20
+asdj
+# END ANSIBLE MANAGED BLOCK

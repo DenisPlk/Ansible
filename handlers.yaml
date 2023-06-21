@@ -1,0 +1,23 @@
+---
+- name: set up web server
+  hosts: lockal
+  tasks:
+   - name: install httpd
+     apt:
+      name: apache2
+      state: latest
+   - name: copy index.html
+     copy:
+      src: /tmp/index.html
+      dest: /var/www/html/index.html
+     notify:
+      - restart_web       
+   - name: copy nothing = fail
+     copy:
+      src: /tmp/nothing
+      dest: /var/www/html/nothing.html
+  handlers:
+   - name: restart_web
+     service: 
+      name: apache2
+      state: restarted

@@ -1,0 +1,10 @@
+---
+- name: using a varibale include file
+  hosts: lockal
+  gather_facts: no
+  vars_files: myvars.yaml
+  tasks:
+   - name: install package {{ mypackage }} 
+     apt:
+       name: "{{ mypackage }}"  
+       state: latest
