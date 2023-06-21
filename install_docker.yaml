@@ -1,0 +1,26 @@
+- name: install docker
+  package:
+     name:
+      - docker.io
+      - pip       
+     state: latest
+- name: install docker pip module
+  pip:
+    name: docker
+- name: start and enable docker deamon
+  service:
+    name: docker
+    enabled: yes
+    state: started  
+- name: create container
+  docker_container:
+    name: mynginx
+    image: nginx
+    state: started  
+- name: generate a list of running containers
+  command: docker ps
+  register: dockerps
+- name: show list of containers
+  debug:
+   var: dockerps.stdout    
+          

@@ -1,0 +1,7 @@
+---
+- name: setup docker
+  hosts: lockal
+  tasks:
+   - include_tasks: install_docker.yaml
+     when:
+      ansible_facts['distribution'] == 'Ubuntu'       
